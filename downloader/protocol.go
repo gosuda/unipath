@@ -1,5 +1,7 @@
 package downloader
 
+import "net/url"
+
 type Protocol uint16
 
 const (
@@ -27,6 +29,23 @@ type UniPath struct {
 	Password string
 }
 
-func (u *UniPath) Url() string {
-	return u.Host + ":" + u.Path
+func (u *UniPath) Url() *url.URL {
+	var user *url.Userinfo
+	if u.User != "" {
+		user = url.User(u.User)
+	}
+	if u.Password != "" {
+		user = url.UserPassword(u.User, u.Password)
+	}
+
+	return &url.URL{
+		Scheme: string(u.Protocol),
+		Host:   u.Host,
+		User:   user,
+		Path:   u.Path,
+	}
+}
+
+func (uniPath *UniPath) String() string {
+	return uniPath.Url().String()
 }
