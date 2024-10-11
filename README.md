@@ -5,7 +5,7 @@
 아래와 같이 `sample.png.hashget` 파일을 작성합니다
 ```yaml
 hash:
-    sha128: 262084257C2103702EF8A25705E3F8DBC1FA3823103AD7B954D54BDB77E6D89D
+    sha256: 262084257C2103702EF8A25705E3F8DBC1FA3823103AD7B954D54BDB77E6D89D
 where:
     - https://www.google.co.kr/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png
     # ipfs link
