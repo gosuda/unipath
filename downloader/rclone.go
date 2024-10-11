@@ -8,7 +8,7 @@ import (
 	"github.com/rclone/rclone/fs/sync"
 )
 
-func DownloadLocal(ctx context.Context, src, dst string) error {
+func DownloadRclone(ctx context.Context, src, dst string) error {
 	var err error
 	fsInfo, err := fs.NewFs(ctx, src)
 	if err != nil {

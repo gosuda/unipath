@@ -30,6 +30,13 @@ func TestDownloadLocalDir(t *testing.T) {
 
 	defer cleanup("a", "b")
 
-	err := DownloadLocal(context.Background(), "a", "b")
+	err := DownloadRclone(context.Background(), "a", "b")
+	require.NoError(t, err)
+}
+
+func TestDownloadHttp(t *testing.T) {
+	defer cleanup("test")
+
+	err := DownloadRclone(context.Background(), ":http,url=https://github.com/pion/webrtc/archive/refs/tags/v4.0.0.zip", "test")
 	require.NoError(t, err)
 }
