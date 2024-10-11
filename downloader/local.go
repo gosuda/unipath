@@ -2,65 +2,83 @@ package downloader
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
-
-	"github.com/rclone/rclone/fs"
-	"github.com/rclone/rclone/fs/operations"
-	"github.com/rclone/rclone/fs/sync"
 )
 
-func DownloadLocal(ctx context.Context, src, dst string) error {
-	if isDir(src) {
-		return copyDir(ctx, src, dst)
+func DownloadLocal(ctx context.Context, srcPath, dstPath string) error {
+	srcInfo, err := os.Stat(srcPath)
+	if err != nil {
+		return fmt.Errorf("could not access source: %w", err)
 	}
-	return copyFile(ctx, src, dst)
+
+	if srcInfo.IsDir() {
+		return copyDir(ctx, srcPath, dstPath)
+	} else {
+		return copyFile(ctx, srcPath, dstPath)
+	}
 }
 
-func isDir(path string) bool {
-	info, err := os.Stat(path)
-	if err != nil {
-		return false
-	}
-
-	return info.IsDir()
-}
-
-// copyDir: 로컬 디렉토리 복사 전용 함수
-func copyDir(ctx context.Context, src, dst string) error {
-	srcFs, err := fs.NewFs(ctx, src)
+func copyFile(ctx context.Context, srcPath, dstPath string) error {
+	dstDir := filepath.Dir(dstPath)
+	err := os.MkdirAll(dstDir, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	dstFs, err := fs.NewFs(ctx, dst)
+	srcFile, err := os.Open(srcPath)
 	if err != nil {
 		return err
 	}
+	defer srcFile.Close()
 
-	err = sync.CopyDir(ctx, dstFs, srcFs, true)
+	dstFile, err := os.Create(dstPath)
 	if err != nil {
 		return err
+	}
+	defer dstFile.Close()
+
+	_, err = copy(ctx, dstFile, srcFile)
+	if err != nil {
+		return fmt.Errorf("file copy error: %w", err)
 	}
 
 	return nil
 }
-
-func copyFile(ctx context.Context, src, dst string) error {
-	srcFs, err := fs.NewFs(ctx, filepath.Dir(src))
+func copyDir(ctx context.Context, srcDir, dstDir string) error {
+	err := os.MkdirAll(dstDir, os.ModePerm)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not create destination directory: %w", err)
 	}
 
-	dstFs, err := fs.NewFs(ctx, filepath.Dir(dst))
-	if err != nil {
-		return err
-	}
+	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 
-	err = operations.CopyFile(ctx, dstFs, srcFs, filepath.Base(dst), filepath.Base(src))
-	if err != nil {
-		return err
-	}
+		relPath, err := filepath.Rel(srcDir, path)
+		if err != nil {
+			return err
+		}
+		dstPath := filepath.Join(dstDir, relPath)
 
-	return nil
+		if info.IsDir() {
+			return os.MkdirAll(dstPath, info.Mode())
+		}
+
+		return copyFile(ctx, path, dstPath)
+	})
+
+	return err
+}
+
+func copy(ctx context.Context, dst io.Writer, src io.Reader) (int64, error) {
+	select {
+	case <-ctx.Done():
+		return 0, ctx.Err()
+	default:
+		return io.Copy(dst, src)
+	}
 }
