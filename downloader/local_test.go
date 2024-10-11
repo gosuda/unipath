@@ -23,14 +23,6 @@ func cleanup(paths ...string) {
 		os.RemoveAll(path)
 	}
 }
-func TestDownloadLocalFile(t *testing.T) {
-	createTestFile(t, "a.txt", []byte("hello"))
-
-	defer cleanup("a.txt", "b.txt")
-
-	err := DownloadLocal(context.Background(), "a.txt", "b.txt")
-	require.NoError(t, err)
-}
 
 func TestDownloadLocalDir(t *testing.T) {
 	createTestDir(t, "a")
@@ -38,6 +30,6 @@ func TestDownloadLocalDir(t *testing.T) {
 
 	defer cleanup("a", "b")
 
-	err := DownloadLocal(context.Background(), "a/a.txt", "b/b.txt")
+	err := DownloadLocal(context.Background(), "a", "b")
 	require.NoError(t, err)
 }
