@@ -1,9 +1,9 @@
 package downloader
 
-type UrlType uint8
+type Protocol uint16
 
 const (
-	File UrlType = iota
+	Local Protocol = iota
 	Http
 	Ftp
 	Sftp
@@ -17,3 +17,15 @@ const (
 	Oracleobjectstorage
 	S3
 )
+
+type UniPath struct {
+	Protocol Protocol
+	Host     string
+	Path     string
+	User     string
+	Password string
+}
+
+func (u *UniPath) Url() string {
+	return u.Host + ":" + u.Path
+}
