@@ -24,19 +24,26 @@ func cleanup(paths ...string) {
 	}
 }
 
-func TestDownloadLocalDir(t *testing.T) {
-	createTestDir(t, "a")
-	createTestFile(t, "a/a.txt", []byte("hello"))
+func TestDownloadLocal(t *testing.T) {
+	for _, test := range []struct {
+		src, dst string
+	}{
+		{"a/a.txt", "b/b.txt"},
+		{"a/a.txt", "b/"},
+		{"a/", "b/"},
+	} {
+		// testDir := t.TempDir()
+		testDir := "./test"
+		createTestDir(t, testDir+"/a")
+		createTestFile(t, testDir+"/a/a.txt", []byte("hello"))
 
-	defer cleanup("a", "b")
-
-	err := DownloadRclone(context.Background(), "a", "b")
-	require.NoError(t, err)
+		err := DownloadLocal(context.Background(), testDir+"/"+test.src, testDir+"/"+test.dst)
+		cleanup(testDir)
+		require.NoError(t, err)
+	}
 }
 
 func TestDownloadHttp(t *testing.T) {
-	defer cleanup("test")
-
-	err := DownloadRclone(context.Background(), ":http,url=https://github.com/pion/webrtc/archive/refs/tags/v4.0.0.zip", "test")
+	err := DownloadUrl(context.Background(), "https://github.com/pion/webrtc/archive/refs/tags/v4.0.0.zip", "test/abc.txt")
 	require.NoError(t, err)
 }
