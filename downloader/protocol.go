@@ -7,6 +7,7 @@ const (
 	Http
 	Ftp
 	Sftp
+	Nfs
 	Torrent
 	Ipfs
 
