@@ -1,4 +1,4 @@
-module gosuda.org/downloader
+module gosuda.org/unipath
 
 go 1.23.2
 
