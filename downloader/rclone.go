@@ -3,7 +3,9 @@ package downloader
 import (
 	"context"
 	"errors"
+	"os/exec"
 	"path"
+	"runtime"
 
 	"github.com/rclone/rclone/fs"
 	"github.com/rclone/rclone/fs/cache"
@@ -44,6 +46,21 @@ func DownloadUrl(ctx context.Context, src, dst string) error {
 	return err
 }
 
+func OpenBrowser(url string) error {
+	var cmd *exec.Cmd
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
+	case "darwin":
+		cmd = exec.Command("open", url)
+	default:
+		cmd = exec.Command("xdg-open", url)
+	}
+
+	return cmd.Start()
+}
+
 func NewFsSrcFileDst(src, dst string) (fsrc fs.Fs, srcFileName string, fdst fs.Fs, dstFileName string) {
 	fsrc, srcFileName = NewFsFile(src)
 	fdst, dstFileName = NewFsFile(dst)
@@ -70,15 +87,4 @@ func NewFsFile(remote string) (fs.Fs, string) {
 		fs.Fatalf(nil, "Failed to create file system for %q: %v", remote, err)
 	}
 	return nil, ""
-}
-
-func newFsDir(remote string) fs.Fs {
-	ctx := context.Background()
-	f, err := cache.Get(ctx, remote)
-	if err != nil {
-		err = fs.CountError(err)
-		fs.Fatalf(nil, "Failed to create file system for %q: %v", remote, err)
-	}
-	cache.Pin(f) // pin indefinitely since it was on the CLI
-	return f
 }

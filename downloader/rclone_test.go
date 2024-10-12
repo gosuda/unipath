@@ -44,6 +44,11 @@ func TestDownloadLocal(t *testing.T) {
 }
 
 func TestDownloadHttp(t *testing.T) {
-	err := DownloadUrl(context.Background(), "https://github.com/pion/webrtc/archive/refs/tags/v4.0.0.zip", "test/abc.txt")
+	err := DownloadUrl(context.Background(), "https://raw.githubusercontent.com/gosuda/unipath/main/go.mod", "test/go.mod")
+	require.NoError(t, err)
+}
+
+func TestOpenBrowser(t *testing.T) {
+	err := OpenBrowser("https://github.com/gosuda")
 	require.NoError(t, err)
 }
