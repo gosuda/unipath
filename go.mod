@@ -3,6 +3,7 @@ module gosuda.org/unipath
 go 1.23.2
 
 require (
+	github.com/alecthomas/kong v1.2.1
 	github.com/rclone/rclone v1.68.1
 	github.com/stretchr/testify v1.9.0
 )
