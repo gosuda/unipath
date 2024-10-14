@@ -1,4 +1,4 @@
-package protocol
+package unipath
 
 type Protocol uint16
 
