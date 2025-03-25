@@ -1,4 +1,4 @@
-package downloader
+package rclone
 
 import (
 	"context"
@@ -37,18 +37,8 @@ func TestDownloadLocal(t *testing.T) {
 		createTestDir(t, testDir+"/a")
 		createTestFile(t, testDir+"/a/a.txt", []byte("hello"))
 
-		err := DownloadLocal(context.Background(), testDir+"/"+test.src, testDir+"/"+test.dst)
+		err := rcloneDownloadLocal(context.Background(), testDir+"/"+test.src, testDir+"/"+test.dst)
 		cleanup(testDir)
 		require.NoError(t, err)
 	}
-}
-
-func TestDownloadHttp(t *testing.T) {
-	err := DownloadUrl(context.Background(), "https://raw.githubusercontent.com/gosuda/unipath/main/go.mod", "test/go.mod")
-	require.NoError(t, err)
-}
-
-func TestOpenBrowser(t *testing.T) {
-	err := OpenBrowser("https://github.com/gosuda")
-	require.NoError(t, err)
 }

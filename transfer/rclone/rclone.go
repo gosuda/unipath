@@ -1,24 +1,35 @@
-package downloader
+package rclone
 
 import (
 	"context"
 	"errors"
-	"os/exec"
+	"io"
 	"path"
-	"runtime"
 
 	"github.com/rclone/rclone/fs"
 	"github.com/rclone/rclone/fs/cache"
 	"github.com/rclone/rclone/fs/fspath"
 	"github.com/rclone/rclone/fs/operations"
 	"github.com/rclone/rclone/fs/sync"
+	"gosuda.org/unipath/unipath"
 )
+
+type RcloneHandler struct {
+}
+
+func (r *RcloneHandler) Read(ctx context.Context, from *unipath.UniPath) (io.ReadCloser, error) {
+	return nil, nil
+}
+
+func (r *RcloneHandler) Write(ctx context.Context, to *unipath.UniPath, reader io.Reader) error {
+	return nil
+}
 
 var (
 	ErrCopyDirectoryToFile = errors.New("can't copy a directory to a file")
 )
 
-func DownloadLocal(ctx context.Context, src, dst string) error {
+func rcloneDownloadLocal(ctx context.Context, src, dst string) error {
 	fsrc, srcFileName, fdst, dstFileName := NewFsSrcFileDst(src, dst)
 	// folder copy
 	if srcFileName == "" {
@@ -35,7 +46,7 @@ func DownloadLocal(ctx context.Context, src, dst string) error {
 	return operations.CopyFile(ctx, fdst, fsrc, dstFileName, srcFileName)
 }
 
-func DownloadUrl(ctx context.Context, src, dst string) error {
+func rcloneDownloadUrl(ctx context.Context, src, dst string) error {
 	var err error
 	fdst, dstFileName := NewFsFile(dst)
 	if dstFileName != "" {
@@ -44,21 +55,6 @@ func DownloadUrl(ctx context.Context, src, dst string) error {
 		_, err = operations.CopyURL(ctx, fdst, dstFileName, src, true, true, false)
 	}
 	return err
-}
-
-func OpenBrowser(url string) error {
-	var cmd *exec.Cmd
-
-	switch runtime.GOOS {
-	case "windows":
-		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
-	case "darwin":
-		cmd = exec.Command("open", url)
-	default:
-		cmd = exec.Command("xdg-open", url)
-	}
-
-	return cmd.Start()
 }
 
 func NewFsSrcFileDst(src, dst string) (fsrc fs.Fs, srcFileName string, fdst fs.Fs, dstFileName string) {

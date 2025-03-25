@@ -1,4 +1,4 @@
-package downloader
+package rclone
 
 import (
 	_ "github.com/rclone/rclone/backend/http"
