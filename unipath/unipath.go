@@ -2,31 +2,37 @@ package unipath
 
 import "net/url"
 
+func NewUniPathFromString(rawurl string) (*UniPath, error) {
+	u, err := url.Parse(rawurl)
+	if err != nil {
+		return nil, err
+	}
+	return &UniPath{
+		Protocol: parseProtocol(u.Scheme),
+		Host:     u.Host,
+		Path:     u.Path,
+	}, nil
+}
+
 type UniPath struct {
-	Protocol Protocol
-	Host     string
-	Path     string
-	User     string
-	Password string
+	Protocol  Protocol
+	Authority string
+	Host      string
+	Path      string
 }
 
 func (u *UniPath) Url() *url.URL {
-	var user *url.Userinfo
-	if u.User != "" {
-		user = url.User(u.User)
-	}
-	if u.Password != "" {
-		user = url.UserPassword(u.User, u.Password)
-	}
-
 	return &url.URL{
 		Scheme: u.Protocol.String(),
 		Host:   u.Host,
-		User:   user,
 		Path:   u.Path,
 	}
 }
 
-func (uniPath *UniPath) String() string {
-	return uniPath.Url().String()
+func (u *UniPath) String() string {
+	return u.Url().String()
+}
+
+func (u *UniPath) IsLocal() bool {
+	return u.Protocol == Local
 }
