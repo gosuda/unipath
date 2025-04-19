@@ -3,7 +3,7 @@ package local
 import (
 	"os"
 
-	"gosuda.org/unipath/transfer/iface"
+	"gosuda.org/unipath/services"
 )
 
 type Object struct {
@@ -29,13 +29,13 @@ func (f *Object) Delete() error {
 	return os.Remove(f.Path)
 }
 
-func (f *Object) Stat() (iface.FileInfo, error) {
+func (f *Object) Stat() (services.FileInfo, error) {
 	fi, err := os.Stat(f.Path)
 	if err != nil {
-		return iface.FileInfo{}, err
+		return services.FileInfo{}, err
 	}
 
-	return iface.FileInfo{
+	return services.FileInfo{
 		Size:         fi.Size(),
 		LastModified: fi.ModTime(),
 	}, nil

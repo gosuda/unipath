@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io"
 
-	"gosuda.org/unipath/transfer/ipfs"
-	"gosuda.org/unipath/transfer/local"
-	"gosuda.org/unipath/transfer/rclone"
-	"gosuda.org/unipath/transfer/torrent"
+	"gosuda.org/unipath/services/ipfs"
+	"gosuda.org/unipath/services/local"
+	"gosuda.org/unipath/services/rclone"
+	"gosuda.org/unipath/services/torrent"
 	"gosuda.org/unipath/unipath"
 )
 

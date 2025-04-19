@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"gosuda.org/unipath/transfer/iface"
+	"gosuda.org/unipath/services"
 )
 
 type File struct {
@@ -29,7 +29,7 @@ func (f *File) WriteString(s string) error {
 	return err
 }
 
-func (f *File) Directory() iface.Directory {
+func (f *File) Directory() services.Directory {
 	return &Directory{
 		Object: Object{
 			Path: filepath.Dir(f.Path),
@@ -59,7 +59,7 @@ func (f *File) Copy(newName string) error {
 	return f.CopyTo(f.Directory(), newName)
 }
 
-func (f *File) CopyTo(dir iface.Directory, newName ...string) error {
+func (f *File) CopyTo(dir services.Directory, newName ...string) error {
 	var filename string
 	if len(newName) > 0 {
 		filename = newName[0]

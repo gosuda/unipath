@@ -3,14 +3,14 @@ package local
 import (
 	"errors"
 
-	"gosuda.org/unipath/transfer/iface"
+	"gosuda.org/unipath/services"
 )
 
 type Config struct {
 	BasePath string
 }
 
-func New(c Config) (iface.Directory, error) {
+func New(c Config) (services.Directory, error) {
 	rootDir := Directory{
 		Object{
 			Path: c.BasePath,
