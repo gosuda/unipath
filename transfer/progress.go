@@ -2,20 +2,20 @@ package transfer
 
 import "io"
 
-type Option func(*config)
-type config struct {
+type Option func(*Config)
+type Config struct {
 	onProgress func(written int64)
 	onComplete func()
 }
 
 func WithProgress(fn func(written int64)) Option {
-	return func(o *config) {
+	return func(o *Config) {
 		o.onProgress = fn
 	}
 }
 
 func WithComplete(fn func()) Option {
-	return func(o *config) {
+	return func(o *Config) {
 		o.onComplete = fn
 	}
 }

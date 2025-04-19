@@ -6,13 +6,14 @@ import (
 	"io"
 
 	"gosuda.org/unipath/transfer/ipfs"
+	"gosuda.org/unipath/transfer/local"
 	"gosuda.org/unipath/transfer/rclone"
 	"gosuda.org/unipath/transfer/torrent"
 	"gosuda.org/unipath/unipath"
 )
 
 func Transfer(ctx context.Context, src, dst string, opts ...Option) error {
-	var cfg config
+	var cfg Config
 	for _, apply := range opts {
 		apply(&cfg)
 	}
@@ -62,7 +63,9 @@ type ProtocolHandler interface {
 
 func getHandler(p unipath.Protocol) (ProtocolHandler, error) {
 	switch p {
-	case unipath.Local, unipath.Http, unipath.Https, unipath.Ftp, unipath.Sftp,
+	case unipath.Local:
+		return &local.Client{}, nil
+	case unipath.Http, unipath.Https, unipath.Ftp, unipath.Sftp,
 		unipath.S3, unipath.Dropbox, unipath.GoogleCloudStorage, unipath.Onedrive:
 		return &rclone.RcloneHandler{}, nil
 	case unipath.Ipfs:
